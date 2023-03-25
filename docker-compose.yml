@@ -1,0 +1,85 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper-employee-challenge
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:latest
+    hostname: broker
+    container_name: kafka-employee-challenge
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+  akhq:
+    image: tchiotludo/akhq
+    container_name: akhq-employee-challenge
+    depends_on:
+      - broker
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            employee-challengen:
+              properties:
+                bootstrap.servers: "broker:29092"
+                default.api.timeout.ms: "60000"
+    ports:
+      - "9080:8080"
+
+  keycloak:
+    image: jboss/keycloak:4.8.3.Final
+    container_name: keycloak-employee-challenge
+    hostname: keycloak
+    command:
+      - "-b"
+      - "0.0.0.0"
+      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.provider=dir"
+      - "-Dkeycloak.migration.dir=/config/"
+      - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+    volumes:
+      - ./docker/keycloak/config:/config/
+    environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: postgres
+        DB_USER: admin
+        DB_SCHEMA: keycloak
+        DB_PASSWORD: admin
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    hostname: postgres
+    container_name: postgres-employee-challenge
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:

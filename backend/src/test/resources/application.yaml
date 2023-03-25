@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+      leak-detection-threshold: 2000
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+keycloak:
+  realm: employee-challenge
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180/auth}
+  resource: backend
+  use-resource-role-mappings: true
+  ssl-required: external
+  credentials:
+    secret: ${CLIENT_SECRET:4fe4dc46-d274-40e7-9eb7-8417bd68b0e6}
+  bearer-only: true

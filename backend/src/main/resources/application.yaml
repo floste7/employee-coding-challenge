@@ -1,0 +1,46 @@
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    consumer:
+      group-id: backend
+  datasource:
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+      leak-detection-threshold: 2000
+    url: ${DATA_SOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=public}
+    username: ${DATA_SOURCE_USERNAME:admin}
+    password: ${DATA_SOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default_schema: public
+springdoc:
+  swagger-ui:
+    operationsSorter: method
+    tags-sorter: alpha
+    oauth:
+      client-id: backend
+      client-secret: ${CLIENT_SECRET:4fe4dc46-d274-40e7-9eb7-8417bd68b0e6}
+  oAuthFlow:
+    authorizationUrl: ${KEYCLOAK_URL:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/auth
+    tokenUrl: ${KEYCLOAK_URL:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/token
+
+keycloak:
+  realm: employee-challenge
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180/auth}
+  resource: backend
+  use-resource-role-mappings: true
+  ssl-required: external
+  credentials:
+    secret: ${CLIENT_SECRET:4fe4dc46-d274-40e7-9eb7-8417bd68b0e6}
+  bearer-only: true
