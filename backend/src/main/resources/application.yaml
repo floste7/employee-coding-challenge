@@ -1,11 +1,6 @@
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
     consumer:
       group-id: backend
   datasource:
@@ -20,10 +15,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      dialect: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         default_schema: public
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 springdoc:
   swagger-ui:
     operationsSorter: method

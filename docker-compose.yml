@@ -1,4 +1,36 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    hostname: backend
+    container_name: backend-employee-challenge
+    ports:
+      - 8080:8080
+    depends_on:
+      - broker
+      - postgres
+    environment:
+      - KAFKA_BROKERS=broker:29092
+      - DATA_SOURCE_URL=jdbc:postgresql://postgres:5432/postgres?currentSchema=public
+      - DATA_SOURCE_USERNAME=admin
+      - DATA_SOURCE_PASSWORD=admin
+      - KEYCLOAK_URL=http://keycloak:8180
+      - CLIENT_SECRET=4fe4dc46-d274-40e7-9eb7-8417bd68b0e6
+
+  analytics:
+    build:
+      context: .
+      dockerfile: ./analytics/Dockerfile
+    hostname: analytics
+    container_name: analytics-employee-challenge
+    ports:
+      - 8081:8081
+    depends_on:
+      - broker
+    environment:
+      - KAFKA_BROKERS=broker:29092
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper
