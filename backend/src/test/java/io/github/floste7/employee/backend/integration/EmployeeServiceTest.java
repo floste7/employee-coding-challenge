@@ -1,7 +1,7 @@
 package io.github.floste7.employee.backend.integration;
 
 import io.github.floste7.employee.backend.config.KafkaConfig;
-import io.github.floste7.employee.backend.event.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
@@ -12,7 +12,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.test.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

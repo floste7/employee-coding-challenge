@@ -52,7 +52,7 @@ public class KafkaConfig {
         log.info("Creating kafka topic {}", EMPLOYEE_EVENT_TOPIC);
 
         return TopicBuilder.name(EMPLOYEE_EVENT_TOPIC)
-                .partitions(10)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }

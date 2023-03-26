@@ -2,7 +2,7 @@ package io.github.floste7.employee.backend.service.impl;
 
 import io.github.floste7.employee.backend.config.KafkaConfig;
 import io.github.floste7.employee.backend.converter.EmployeeConverter;
-import io.github.floste7.employee.backend.event.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;

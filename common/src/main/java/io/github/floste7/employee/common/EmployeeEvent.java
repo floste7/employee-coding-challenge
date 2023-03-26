@@ -1,6 +1,5 @@
-package io.github.floste7.employee.backend.event;
+package io.github.floste7.employee.common;
 
-import io.github.floste7.employee.common.EmployeeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

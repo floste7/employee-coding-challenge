@@ -1,0 +1,30 @@
+spring:
+  cloud:
+    function:
+      definition: processEmployeeEvents
+    stream:
+      bindings:
+        processEmployeeEvents-in-0:
+          destination: employee-events
+        processEmployeeEvents-out-0:
+          destination: employee-events-processd
+      kafka:
+        streams:
+          binder:
+            brokers: localhost:9092
+            functions:
+              processLoginEvents:
+                applicationId: employee-event-processor
+            applicationId: analytics-service
+            configuration:
+              application:
+                server: localhost:9092
+              commit.interval.ms: 100
+              # Provide default values, otherwise: IllegalStateException - No Header
+              spring.json.key.default.type: java.lang.String
+              spring.json.value.default.type: io.github.floste7.employee.common.EmployeeEvent
+              default:
+                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value.serde: org.springframework.kafka.support.serializer.JsonSerde
+server:
+  port: 8081

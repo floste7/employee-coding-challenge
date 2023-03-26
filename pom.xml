@@ -12,6 +12,7 @@
     <modules>
         <module>backend</module>
         <module>common</module>
+        <module>analytics</module>
     </modules>
 
     <properties>
@@ -19,6 +20,7 @@
         <maven.compiler.target>11</maven.compiler.target>
 
         <spring-boot.version>2.7.10</spring-boot.version>
+        <spring-cloud-dependencies.version>2021.0.6</spring-cloud-dependencies.version>
         <lombok.version>1.18.20</lombok.version>
         <posgresql.version>42.2.14</posgresql.version>
         <h2.version>2.1.214</h2.version>
@@ -42,6 +44,13 @@
                 <groupId>org.keycloak.bom</groupId>
                 <artifactId>keycloak-adapter-bom</artifactId>
                 <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
