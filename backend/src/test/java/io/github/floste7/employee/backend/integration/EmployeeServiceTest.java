@@ -7,6 +7,7 @@ import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
 import io.github.floste7.employee.backend.service.impl.DefaultEmployeeService;
 import io.github.floste7.employee.common.EmployeeDto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -27,6 +29,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -37,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 @Transactional
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@Slf4j
 public class EmployeeServiceTest {
 
     @Autowired
@@ -57,8 +61,12 @@ public class EmployeeServiceTest {
 
     @AfterEach
     public void afterEach() {
-        employeeRepository.deleteAll();
-        consumer.close();
+        try {
+            employeeRepository.deleteAll();
+            consumer.close();
+        } catch (Exception ex) {
+            log.error("Exception caught in afterEach()", ex);
+        }
     }
 
     @Test
@@ -138,6 +146,17 @@ public class EmployeeServiceTest {
 
         //Last event should be of type DELETED
         assertEquals(EmployeeEvent.Type.DELETED, allEvents.get(allEvents.size() - 1).getType());
+    }
+
+    @Test
+    public void whenEmployeeCreatedWithExistingEmail_throwException() {
+        EmployeeService employeeService = new DefaultEmployeeService(employeeRepository, kafkaTemplate);
+
+        EmployeeDto employeeDto = getSampleEmployee();
+        employeeService.create(employeeDto);
+
+        //Save same employee with same e-mail again
+        assertThrows(DataIntegrityViolationException.class, () -> employeeService.create(employeeDto));
     }
 
     private Consumer<String, Object> configureConsumer() {

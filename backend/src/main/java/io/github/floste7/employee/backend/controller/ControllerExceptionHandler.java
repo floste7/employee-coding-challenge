@@ -46,7 +46,7 @@ public class ControllerExceptionHandler {
     public ResponseEntity<DefaultError> handleDataIntegrityException(DataIntegrityViolationException ex, WebRequest wr) {
         log.warn("Unable to handle {}: {}", wr.getDescription(false), ex.getMessage());
 
-        return new ResponseEntity<>(new DefaultError(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new DefaultError("E-Mail addresses must be unique!"), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
