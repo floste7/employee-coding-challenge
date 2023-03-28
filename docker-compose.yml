@@ -15,8 +15,9 @@ services:
       - DATA_SOURCE_URL=jdbc:postgresql://postgres:5432/postgres?currentSchema=public
       - DATA_SOURCE_USERNAME=admin
       - DATA_SOURCE_PASSWORD=admin
-      - KEYCLOAK_URL=http://keycloak:8180
-      - CLIENT_SECRET=4fe4dc46-d274-40e7-9eb7-8417bd68b0e6
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_URL_SWAGGER_UI=http://localhost:8180
+      - CLIENT_SECRET=HXq6eBgykSEOJhBEw8kEMsDDbxD3gUsV
 
   analytics:
     build:
@@ -86,27 +87,30 @@ services:
       - "9080:8080"
 
   keycloak:
-    image: jboss/keycloak:4.8.3.Final
+    image: jboss/keycloak:16.1.1
     container_name: keycloak-employee-challenge
     hostname: keycloak
     command:
       - "-b"
       - "0.0.0.0"
-      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.action=export"
       - "-Dkeycloak.migration.provider=dir"
-      - "-Dkeycloak.migration.dir=/config/"
+      - "-Dkeycloak.migration.dir=/opt/jboss/keycloak/exports/"
+      - "-Dkeycloak.import=/opt/jboss/keycloak/imports/employee-challenge-realm.json"
       - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+      - "-Dkeycloak.migration.usersExportStrategy=REALM_FILE"
     volumes:
-      - ./docker/keycloak/config:/config/
+      - ./docker/keycloak/config:/opt/jboss/keycloak/imports
     environment:
         DB_VENDOR: POSTGRES
         DB_ADDR: postgres
         DB_DATABASE: postgres
         DB_USER: admin
-        DB_SCHEMA: keycloak
+        DB_SCHEMA: public
         DB_PASSWORD: admin
         KEYCLOAK_USER: admin
         KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/employee-challenge-realm.json  -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - "8180:8080"
     depends_on:
