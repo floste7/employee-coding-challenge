@@ -25,7 +25,7 @@ cd employee-coding-challenge
 docker-compose up
 ```
 
-Since this command is downloading and building docker containers for all required service, it may take a while for all
+Since this command is downloading and building docker containers for all required services, it may take a while for all
 services to start up (depending on your internet connection approx. 15 minutes).
 
 Following services are available after successful start-up:
@@ -69,7 +69,7 @@ splits the application in a microservice based system and introduces two additio
 - CQRS (Command Query Responsibility Segregation)
 
 ### Event Sourcing
-The ```backend-read``` service consumes the domain events produces by the ```backend``` service, and instead of keeping
+The ```backend-read``` service consumes the domain events produced by the ```backend``` service, and instead of keeping
 the employee's state by updating a database entity, it commits the domain events to an append-only changelog stream.
 The last domain event of a specific employee therefore represents the employee's current state. In order to achieve this,
 the ```backend-read``` service uses Kafka's ```KTable``` abstraction and materializes the changelog stream to Kafka's
