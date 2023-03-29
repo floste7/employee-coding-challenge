@@ -1,5 +1,7 @@
 package io.github.floste7.employee.backend.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -18,6 +20,8 @@ public class Employee {
     private String fullName;
 
     @Column(name = "birthday")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date birthday;
 
     @OneToMany(cascade = CascadeType.ALL)

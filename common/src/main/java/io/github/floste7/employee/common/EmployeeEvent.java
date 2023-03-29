@@ -1,6 +1,5 @@
-package io.github.floste7.employee.backend.event;
+package io.github.floste7.employee.common;
 
-import io.github.floste7.employee.common.EmployeeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class EmployeeEvent {
+
+    public static final String EMPLOYEE_EVENT_TOPIC = "employee-events";
 
     public enum Type {
         CREATED, UPDATED, DELETED;

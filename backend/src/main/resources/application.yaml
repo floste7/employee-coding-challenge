@@ -5,7 +5,7 @@ logging:
         security: DEBUG
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
     consumer:
       group-id: backend
   datasource:
@@ -19,28 +19,28 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-      dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: update
     properties:
       hibernate:
         default_schema: public
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 springdoc:
   swagger-ui:
     operationsSorter: method
     tags-sorter: alpha
     oauth:
       client-id: backend
-      client-secret: ${CLIENT_SECRET:4fe4dc46-d274-40e7-9eb7-8417bd68b0e6}
+      client-secret: ${CLIENT_SECRET:HXq6eBgykSEOJhBEw8kEMsDDbxD3gUsV}
   oAuthFlow:
-    authorizationUrl: ${KEYCLOAK_URL:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/auth
-    tokenUrl: ${KEYCLOAK_URL:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/token
+    authorizationUrl: ${KEYCLOAK_URL_SWAGGER:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/auth
+    tokenUrl: ${KEYCLOAK_URL_SWAGGER_UI:http://localhost:8180}/auth/realms/employee-challenge/protocol/openid-connect/token
 
 keycloak:
   realm: employee-challenge
-  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180/auth}
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180}/auth
   resource: backend
   use-resource-role-mappings: true
   ssl-required: external
   credentials:
-    secret: ${CLIENT_SECRET:4fe4dc46-d274-40e7-9eb7-8417bd68b0e6}
+    secret: ${CLIENT_SECRET:HXq6eBgykSEOJhBEw8kEMsDDbxD3gUsV}
   bearer-only: true

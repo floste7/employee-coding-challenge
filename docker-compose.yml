@@ -1,4 +1,37 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    hostname: backend
+    container_name: backend-employee-challenge
+    ports:
+      - 8080:8080
+    depends_on:
+      - broker
+      - postgres
+    environment:
+      - KAFKA_BROKERS=broker:29092
+      - DATA_SOURCE_URL=jdbc:postgresql://postgres:5432/postgres?currentSchema=public
+      - DATA_SOURCE_USERNAME=admin
+      - DATA_SOURCE_PASSWORD=admin
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_URL_SWAGGER_UI=http://localhost:8180
+      - CLIENT_SECRET=HXq6eBgykSEOJhBEw8kEMsDDbxD3gUsV
+
+  backend-read:
+    build:
+      context: .
+      dockerfile: ./backend-read/Dockerfile
+    hostname: backend-read
+    container_name: backend-read-employee-challenge
+    ports:
+      - 8081:8081
+    depends_on:
+      - broker
+    environment:
+      - KAFKA_BROKERS=broker:29092
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper
@@ -10,7 +43,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-server:7.0.1
     hostname: broker
     container_name: kafka-employee-challenge
     depends_on:
@@ -20,11 +53,22 @@ services:
       - "9101:9101"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   akhq:
     image: tchiotludo/akhq
@@ -43,27 +87,31 @@ services:
       - "9080:8080"
 
   keycloak:
-    image: jboss/keycloak:4.8.3.Final
+    image: jboss/keycloak:16.1.1
     container_name: keycloak-employee-challenge
     hostname: keycloak
     command:
       - "-b"
       - "0.0.0.0"
-      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.action=export"
       - "-Dkeycloak.migration.provider=dir"
-      - "-Dkeycloak.migration.dir=/config/"
+      - "-Dkeycloak.migration.dir=/opt/jboss/keycloak/exports/"
+      - "-Dkeycloak.import=/opt/jboss/keycloak/imports/employee-challenge-realm.json"
       - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+      - "-Dkeycloak.migration.usersExportStrategy=REALM_FILE"
     volumes:
-      - ./docker/keycloak/config:/config/
+      - ./docker/keycloak/config:/opt/jboss/keycloak/imports
     environment:
         DB_VENDOR: POSTGRES
         DB_ADDR: postgres
         DB_DATABASE: postgres
         DB_USER: admin
-        DB_SCHEMA: keycloak
+        DB_SCHEMA: public
         DB_PASSWORD: admin
         KEYCLOAK_USER: admin
         KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/employee-challenge-realm.json  -Dkeycloak.profile.feature.upload_scripts=enabled
+        KEYCLOAK_FRONTEND_URL: http://localhost:8080/auth
     ports:
       - "8180:8080"
     depends_on:

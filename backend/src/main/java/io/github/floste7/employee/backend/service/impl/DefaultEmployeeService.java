@@ -2,7 +2,7 @@ package io.github.floste7.employee.backend.service.impl;
 
 import io.github.floste7.employee.backend.config.KafkaConfig;
 import io.github.floste7.employee.backend.converter.EmployeeConverter;
-import io.github.floste7.employee.backend.event.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
@@ -49,7 +49,7 @@ public class DefaultEmployeeService implements EmployeeService {
         log.info("Employee with id {} created.", savedEmployee.getId());
 
         EmployeeDto savedEmployeeDto = EmployeeConverter.INSTANCE.toDto(savedEmployee);
-        kafkaTemplate.send(KafkaConfig.EMPLOYEE_EVENT_TOPIC, savedEmployee.getId(), EmployeeEvent.builder()
+        kafkaTemplate.send(EmployeeEvent.EMPLOYEE_EVENT_TOPIC, savedEmployee.getId(), EmployeeEvent.builder()
                 .type(EmployeeEvent.Type.CREATED)
                 .employee(savedEmployeeDto)
                 .build());
@@ -66,7 +66,7 @@ public class DefaultEmployeeService implements EmployeeService {
         log.info("Employee with id {} updated", updatedEmployee.getId());
 
         EmployeeDto updatedEmployeeDto = EmployeeConverter.INSTANCE.toDto(updatedEmployee);
-        kafkaTemplate.send(KafkaConfig.EMPLOYEE_EVENT_TOPIC, updatedEmployeeDto.getId(), EmployeeEvent.builder()
+        kafkaTemplate.send(EmployeeEvent.EMPLOYEE_EVENT_TOPIC, updatedEmployeeDto.getId(), EmployeeEvent.builder()
                 .type(EmployeeEvent.Type.UPDATED)
                 .employee(updatedEmployeeDto)
                 .build());
@@ -83,7 +83,7 @@ public class DefaultEmployeeService implements EmployeeService {
         log.info("Employee with id {} deleted", id);
 
         EmployeeDto deletedEmployee = EmployeeConverter.INSTANCE.toDto(employee);
-        kafkaTemplate.send(KafkaConfig.EMPLOYEE_EVENT_TOPIC, deletedEmployee.getId(), EmployeeEvent.builder()
+        kafkaTemplate.send(EmployeeEvent.EMPLOYEE_EVENT_TOPIC, deletedEmployee.getId(), EmployeeEvent.builder()
                 .type(EmployeeEvent.Type.DELETED)
                 .employee(deletedEmployee)
                 .build());

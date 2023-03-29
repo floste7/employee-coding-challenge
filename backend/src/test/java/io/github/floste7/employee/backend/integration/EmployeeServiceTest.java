@@ -1,23 +1,23 @@
 package io.github.floste7.employee.backend.integration;
 
-import io.github.floste7.employee.backend.config.KafkaConfig;
-import io.github.floste7.employee.backend.event.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
 import io.github.floste7.employee.backend.service.impl.DefaultEmployeeService;
 import io.github.floste7.employee.common.EmployeeDto;
+import io.github.floste7.employee.common.EmployeeEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.test.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -35,9 +35,10 @@ import java.util.stream.StreamSupport;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@Slf4j
 public class EmployeeServiceTest {
 
     @Autowired
@@ -58,8 +59,12 @@ public class EmployeeServiceTest {
 
     @AfterEach
     public void afterEach() {
-        employeeRepository.deleteAll();
-        consumer.close();
+        try {
+            employeeRepository.deleteAll();
+            consumer.close();
+        } catch (Exception ex) {
+            log.error("Exception caught in afterEach()", ex);
+        }
     }
 
     @Test
@@ -76,7 +81,7 @@ public class EmployeeServiceTest {
         assertDoesNotThrow(() -> employeeRepository.findById(employeeDto.getId()).get());
 
         //Kafka Assertions
-        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(consumer, KafkaConfig.EMPLOYEE_EVENT_TOPIC);
+        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(consumer, EmployeeEvent.EMPLOYEE_EVENT_TOPIC);
         assertEquals(createdEmployee.getId(), singleRecord.key());
         assertEquals(EmployeeEvent.Type.CREATED, ((EmployeeEvent) singleRecord.value()).getType());
         assertEquals(createdEmployee, ((EmployeeEvent) singleRecord.value()).getEmployee());
@@ -141,6 +146,17 @@ public class EmployeeServiceTest {
         assertEquals(EmployeeEvent.Type.DELETED, allEvents.get(allEvents.size() - 1).getType());
     }
 
+    @Test
+    public void whenEmployeeCreatedWithExistingEmail_throwException() {
+        EmployeeService employeeService = new DefaultEmployeeService(employeeRepository, kafkaTemplate);
+
+        EmployeeDto employeeDto = getSampleEmployee();
+        employeeService.create(employeeDto);
+
+        //Save same employee with same e-mail again
+        assertThrows(DataIntegrityViolationException.class, () -> employeeService.create(employeeDto));
+    }
+
     private Consumer<String, Object> configureConsumer() {
         Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker);
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -150,7 +166,7 @@ public class EmployeeServiceTest {
 
         Consumer<String, Object> consumer = new DefaultKafkaConsumerFactory<String, Object>(consumerProps)
                 .createConsumer();
-        consumer.subscribe(Collections.singleton(KafkaConfig.EMPLOYEE_EVENT_TOPIC));
+        consumer.subscribe(Collections.singleton(EmployeeEvent.EMPLOYEE_EVENT_TOPIC));
 
         return consumer;
     }
