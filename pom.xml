@@ -11,8 +11,8 @@
 
     <modules>
         <module>backend</module>
+        <module>backend-read</module>
         <module>common</module>
-        <module>analytics</module>
     </modules>
 
     <properties>

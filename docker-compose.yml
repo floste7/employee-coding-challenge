@@ -19,12 +19,12 @@ services:
       - KEYCLOAK_URL_SWAGGER_UI=http://localhost:8180
       - CLIENT_SECRET=HXq6eBgykSEOJhBEw8kEMsDDbxD3gUsV
 
-  analytics:
+  backend-read:
     build:
       context: .
-      dockerfile: ./analytics/Dockerfile
-    hostname: analytics
-    container_name: analytics-employee-challenge
+      dockerfile: ./backend-read/Dockerfile
+    hostname: backend-read
+    container_name: backend-read-employee-challenge
     ports:
       - 8081:8081
     depends_on:

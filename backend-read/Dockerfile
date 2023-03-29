@@ -20,11 +20,12 @@ COPY common/src /opt/app/common/src
 COPY backend/src /opt/app/backend/src
 COPY backend-read/src /opt/app/backend-read/src
 
+# Build entire project
 RUN mvn -B -e clean install -DskipTests=true
 
 FROM openjdk:11
 WORKDIR /opt/app
 
-# Only copy what backend.jar from previous step
-COPY --from=builder /opt/app/backend/target/backend.jar .
-CMD [ "java", "-jar", "/opt/app/backend.jar" ]
+# Only copy what backend-read.jar from previous step
+COPY --from=builder /opt/app/backend-read/target/backend-read.jar .
+CMD [ "java", "-jar", "/opt/app/backend-read.jar" ]
