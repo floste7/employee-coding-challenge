@@ -33,7 +33,7 @@ Following services are available after successful start-up:
 | Service        | Description                                                                                                     | URL (front-end)                               |
 |----------------|-----------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
 | backend        | Contains the business logic                                                                                     | http://localhost:8080/swagger-ui/index.html   |
-| backend-read   | Exposes REST API for reading employees with an [alternative architecture](#Additional Thoughts on Architecture) | http://localhost:8081/swagger-ui/index.html   |
+| backend-read   | Exposes REST API for reading employees with an [alternative architecture](#additional-thoughts-on-architecture) | http://localhost:8081/swagger-ui/index.html   |
 | zookeeper      | Zookeeper for managing the Kafka cluster                                                                        | -                                             |
 | broker         | Kafka Broker                                                                                                    | -                                             |
 | akhq           | Frontend for managing and viewing Kafka clusters                                                                | http://localhost:9080                         |
