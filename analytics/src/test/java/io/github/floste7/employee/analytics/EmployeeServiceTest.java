@@ -26,7 +26,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
 public class EmployeeServiceTest {
 
@@ -49,7 +49,7 @@ public class EmployeeServiceTest {
 
         //Query state store
         EmployeeService employeeService = new DefaultEmployeeService(interactiveQueryService);
-        List<EmployeeEvent> allEmployees = employeeService.getAllEmployees();
+        List<EmployeeDto> allEmployees = employeeService.getAllEmployees();
 
         assertEquals(1, allEmployees.size());
     }
@@ -73,10 +73,9 @@ public class EmployeeServiceTest {
 
         //Query state store
         EmployeeService employeeService = new DefaultEmployeeService(interactiveQueryService);
-        EmployeeEvent employeeEvent = employeeService.getEmployeeById("employee-id-1");
+        EmployeeDto employee = employeeService.getEmployeeById("employee-id-1");
 
-        assertEquals(EmployeeEvent.Type.UPDATED, employeeEvent.getType());
-        assertEquals("updated-email@example.com", employeeEvent.getEmployee().getEmail());
+        assertEquals("updated-email@example.com", employee.getEmail());
     }
 
     private KafkaTemplate<String, Object> configureProducer() {

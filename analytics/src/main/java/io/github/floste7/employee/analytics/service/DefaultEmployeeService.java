@@ -2,7 +2,8 @@ package io.github.floste7.employee.analytics.service;
 
 import io.github.floste7.employee.analytics.exception.EntityNotFoundException;
 import io.github.floste7.employee.analytics.processor.EmployeeEventProcessor;
-import io.github.floste7.employee.common.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeDto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DefaultEmployeeService implements EmployeeService {
 
@@ -22,32 +24,32 @@ public class DefaultEmployeeService implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeEvent> getAllEmployees() {
-        ReadOnlyKeyValueStore<String, EmployeeEvent> employeeStore = interactiveQueryService
+    public List<EmployeeDto> getAllEmployees() {
+        ReadOnlyKeyValueStore<String, EmployeeDto> employeeStateStore = interactiveQueryService
                 .getQueryableStore(EmployeeEventProcessor.EMPLOYEE_STATE_STORE, QueryableStoreTypes.keyValueStore());
 
-        List<EmployeeEvent> allEmployees = new ArrayList<>();
-        KeyValueIterator<String, EmployeeEvent> employeeIterator = employeeStore.all();
+        List<EmployeeDto> allEmployees = new ArrayList<>();
+        KeyValueIterator<String, EmployeeDto> employeeStateIterator = employeeStateStore.all();
 
-        while (employeeIterator.hasNext()) {
-            allEmployees.add(employeeIterator.next().value);
+        while (employeeStateIterator.hasNext()) {
+            allEmployees.add(employeeStateIterator.next().value);
         }
-        employeeIterator.close();
+        employeeStateIterator.close();
 
         return allEmployees;
     }
 
     @Override
-    public EmployeeEvent getEmployeeById(String id) {
-        ReadOnlyKeyValueStore<String, EmployeeEvent> employeeStore = interactiveQueryService
+    public EmployeeDto getEmployeeById(String id) {
+        ReadOnlyKeyValueStore<String, EmployeeDto> employeeStateStore = interactiveQueryService
                 .getQueryableStore(EmployeeEventProcessor.EMPLOYEE_STATE_STORE, QueryableStoreTypes.keyValueStore());
 
-        EmployeeEvent employeeEvent = employeeStore.get(id);
+        EmployeeDto employeeState = employeeStateStore.get(id);
 
-        if(employeeEvent == null) {
+        if(employeeState == null) {
             throw new EntityNotFoundException("Employee with id " + id + " does not exist");
         }
 
-        return employeeEvent;
+        return employeeState;
     }
 }

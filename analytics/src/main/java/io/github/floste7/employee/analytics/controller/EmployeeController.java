@@ -1,7 +1,7 @@
 package io.github.floste7.employee.analytics.controller;
 
 import io.github.floste7.employee.analytics.service.EmployeeService;
-import io.github.floste7.employee.common.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeDto;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +24,13 @@ public class EmployeeController {
 
     @GetMapping
     @Operation(summary = "Returns all employees")
-    public ResponseEntity<List<EmployeeEvent>> getAll() {
+    public ResponseEntity<List<EmployeeDto>> getAll() {
         return new ResponseEntity<>(employeeService.getAllEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("/{employeeId}")
     @Operation(summary = "Returns an employee with a given id")
-    public ResponseEntity<EmployeeEvent> getEmployeeById(@PathVariable("employeeId") String employeeId) {
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("employeeId") String employeeId) {
         return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
     }
 }

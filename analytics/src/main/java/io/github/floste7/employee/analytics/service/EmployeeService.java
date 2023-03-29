@@ -1,13 +1,13 @@
 package io.github.floste7.employee.analytics.service;
 
-import io.github.floste7.employee.common.EmployeeEvent;
+import io.github.floste7.employee.common.EmployeeDto;
 
 import java.util.List;
 
 public interface EmployeeService {
 
-    List<EmployeeEvent> getAllEmployees();
+    List<EmployeeDto> getAllEmployees();
 
-    EmployeeEvent getEmployeeById(String id);
+    EmployeeDto getEmployeeById(String id);
 
 }

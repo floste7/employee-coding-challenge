@@ -6,8 +6,6 @@ spring:
       bindings:
         processEmployeeEvents-in-0:
           destination: employee-events
-        processEmployeeEvents-out-0:
-          destination: employee-events-processd
       kafka:
         streams:
           binder:
