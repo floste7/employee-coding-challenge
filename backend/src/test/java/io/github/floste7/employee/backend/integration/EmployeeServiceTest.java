@@ -29,7 +29,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
