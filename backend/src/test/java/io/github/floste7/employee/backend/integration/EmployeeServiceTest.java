@@ -1,12 +1,11 @@
 package io.github.floste7.employee.backend.integration;
 
-import io.github.floste7.employee.backend.config.KafkaConfig;
-import io.github.floste7.employee.common.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
 import io.github.floste7.employee.backend.service.impl.DefaultEmployeeService;
 import io.github.floste7.employee.common.EmployeeDto;
+import io.github.floste7.employee.common.EmployeeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -82,7 +81,7 @@ public class EmployeeServiceTest {
         assertDoesNotThrow(() -> employeeRepository.findById(employeeDto.getId()).get());
 
         //Kafka Assertions
-        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(consumer, KafkaConfig.EMPLOYEE_EVENT_TOPIC);
+        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(consumer, EmployeeEvent.EMPLOYEE_EVENT_TOPIC);
         assertEquals(createdEmployee.getId(), singleRecord.key());
         assertEquals(EmployeeEvent.Type.CREATED, ((EmployeeEvent) singleRecord.value()).getType());
         assertEquals(createdEmployee, ((EmployeeEvent) singleRecord.value()).getEmployee());
@@ -167,7 +166,7 @@ public class EmployeeServiceTest {
 
         Consumer<String, Object> consumer = new DefaultKafkaConsumerFactory<String, Object>(consumerProps)
                 .createConsumer();
-        consumer.subscribe(Collections.singleton(KafkaConfig.EMPLOYEE_EVENT_TOPIC));
+        consumer.subscribe(Collections.singleton(EmployeeEvent.EMPLOYEE_EVENT_TOPIC));
 
         return consumer;
     }

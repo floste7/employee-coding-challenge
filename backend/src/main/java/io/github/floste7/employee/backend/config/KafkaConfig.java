@@ -1,5 +1,6 @@
 package io.github.floste7.employee.backend.config;
 
+import io.github.floste7.employee.common.EmployeeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -19,8 +20,6 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class KafkaConfig {
-
-    public static final String EMPLOYEE_EVENT_TOPIC = "employee-events";
 
     private final KafkaProperties kafkaProperties;
 
@@ -49,9 +48,9 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic employeeEventTopic() {
-        log.info("Creating kafka topic {}", EMPLOYEE_EVENT_TOPIC);
+        log.info("Creating kafka topic {}", EmployeeEvent.EMPLOYEE_EVENT_TOPIC);
 
-        return TopicBuilder.name(EMPLOYEE_EVENT_TOPIC)
+        return TopicBuilder.name(EmployeeEvent.EMPLOYEE_EVENT_TOPIC)
                 .partitions(1)
                 .replicas(1)
                 .build();
