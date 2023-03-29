@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of an {@link EmployeeService} which uses Kafka's {@link InteractiveQueryService} to retrieve
+ * {@link EmployeeDto}.
+ */
 @Slf4j
 @Service
 public class DefaultEmployeeService implements EmployeeService {
@@ -23,6 +27,9 @@ public class DefaultEmployeeService implements EmployeeService {
         this.interactiveQueryService = interactiveQueryService;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<EmployeeDto> getAllEmployees() {
         ReadOnlyKeyValueStore<String, EmployeeDto> employeeStateStore = interactiveQueryService
@@ -39,6 +46,9 @@ public class DefaultEmployeeService implements EmployeeService {
         return allEmployees;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EmployeeDto getEmployeeById(String id) {
         ReadOnlyKeyValueStore<String, EmployeeDto> employeeStateStore = interactiveQueryService

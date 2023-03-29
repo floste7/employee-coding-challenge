@@ -1,12 +1,11 @@
 package io.github.floste7.employee.backend.service.impl;
 
-import io.github.floste7.employee.backend.config.KafkaConfig;
 import io.github.floste7.employee.backend.converter.EmployeeConverter;
-import io.github.floste7.employee.common.EmployeeEvent;
 import io.github.floste7.employee.backend.model.Employee;
 import io.github.floste7.employee.backend.repository.EmployeeRepository;
 import io.github.floste7.employee.backend.service.EmployeeService;
 import io.github.floste7.employee.common.EmployeeDto;
+import io.github.floste7.employee.common.EmployeeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,10 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Implementation of an {@link EmployeeService} which performs the CRUD operations against an
+ * {@link EmployeeRepository}. With each create, update or delete operation, a domain event is sent to kafka.
+ */
 @Slf4j
 @Service
 public class DefaultEmployeeService implements EmployeeService {
@@ -28,11 +31,17 @@ public class DefaultEmployeeService implements EmployeeService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<EmployeeDto> getAll() {
         return EmployeeConverter.INSTANCE.toDtoList(employeeRepository.findAll());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EmployeeDto get(String id) {
         Employee employee = employeeRepository.findById(id)
@@ -41,6 +50,9 @@ public class DefaultEmployeeService implements EmployeeService {
         return EmployeeConverter.INSTANCE.toDto(employee);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EmployeeDto create(EmployeeDto employeeDto) {
         employeeDto.setId(UUID.randomUUID().toString());
@@ -57,6 +69,9 @@ public class DefaultEmployeeService implements EmployeeService {
         return savedEmployeeDto;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EmployeeDto update(EmployeeDto employeeDto) {
         if(!employeeRepository.existsById(employeeDto.getId()))
@@ -74,6 +89,9 @@ public class DefaultEmployeeService implements EmployeeService {
         return updatedEmployeeDto;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(String id) {
         Employee employee = employeeRepository.findById(id)

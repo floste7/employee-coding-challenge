@@ -17,12 +17,6 @@ import java.util.Date;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    /**
-     * Handles unknown Exception and server errors
-     *
-     * @param ex thrown exception
-     * @param wr web request
-     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<DefaultError> unknownException(Exception ex, WebRequest wr) {
